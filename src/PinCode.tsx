@@ -12,7 +12,7 @@ import {
   StyleSheet,
   Text,
   TextStyle,
-  TouchableHighlight,
+  TouchableHighlight, TouchableOpacity,
   Vibration,
   View,
   ViewStyle
@@ -85,7 +85,13 @@ export interface IProps {
   titleValidationFailed?: string
   validationRegex?: RegExp
   vibrationEnabled?: boolean
-  delayBetweenAttempts?: number;
+  delayBetweenAttempts?: number
+
+  styleButton?: any
+  textButton?: string
+  onClickButton?: any
+  buttonComponent?: any
+  styleViewButton?: null;
 }
 
 export interface IState {
@@ -138,6 +144,8 @@ class PinCode extends React.PureComponent<IProps, IState> {
     textPasswordVisibleSize: 22,
     vibrationEnabled: true,
     delayBetweenAttempts: 3000,
+    styleButton: null,
+    textButton: "Reset Pin",
   }
 
   private readonly _circleSizeEmpty: number;
@@ -154,6 +162,7 @@ class PinCode extends React.PureComponent<IProps, IState> {
       attemptFailed: false,
       changeScreen: false
     };
+    this.renderButton = this.renderButton.bind(this);
     this._circleSizeEmpty = this.props.styleCircleSizeEmpty || 4;
     this._circleSizeFull =
       this.props.styleCircleSizeFull || (this.props.pinCodeVisible ? 6 : 8);
@@ -575,6 +584,31 @@ class PinCode extends React.PureComponent<IProps, IState> {
     );
   };
 
+
+  renderButton = () => {
+    return (
+        <TouchableOpacity
+            onPress={() => {
+              if (this.props.onClickButton) {
+                this.props.onClickButton();
+              } else {
+                throw "Quit application";
+              }
+            }}
+            style={[styles.button, this.props.styleButton]}
+            accessible
+            accessibilityLabel={this.props.textButton}>
+          <Text
+              style={[
+                styles.closeButtonText,
+                this.props.styleTextButton
+              ]}>
+            {this.props.textButton}
+          </Text>
+        </TouchableOpacity>
+    );
+  };
+
   render() {
     const { password, showError, attemptFailed, changeScreen } = this.state;
     return (
@@ -641,6 +675,29 @@ class PinCode extends React.PureComponent<IProps, IState> {
                   showError
                 )}
             </View>
+          )}
+        </Animate>
+        <Animate
+            show={true}
+            start={{
+              opacity: 0
+            }}
+            enter={{
+              opacity: [1],
+              timing: { delay: 2000, duration: 1500, ease: easeLinear }
+            }}>
+          {(state: any) => (
+              <View style={{ opacity: state.opacity, flex: 1 }}>
+                <View
+                    style={[
+                      styles.viewCloseButton,
+                      this.props.styleViewButton
+                    ]}>
+                  {this.props.buttonComponent
+                      ? this.props.buttonComponent()
+                      : this.renderButton()}
+                </View>
+              </View>
           )}
         </Animate>
         <View style={styles.flexCirclePassword}>
@@ -879,6 +936,25 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-start',
     width: "100%",
     flex: 7
+  },
+  viewCloseButton: {
+    alignItems: "center",
+    opacity: grid.mediumOpacity,
+    justifyContent: "center",
+    marginTop: grid.unit * 2
+  },
+  button: {
+    backgroundColor: colors.turquoise,
+    borderRadius: grid.border,
+    paddingLeft: grid.unit * 2,
+    paddingRight: grid.unit * 2,
+    paddingBottom: grid.unit,
+    paddingTop: grid.unit
+  },
+  closeButtonText: {
+    color: colors.white,
+    fontWeight: "bold",
+    fontSize: 14
   }
 });
 
