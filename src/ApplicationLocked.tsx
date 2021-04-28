@@ -203,12 +203,12 @@ class ApplicationLocked extends React.PureComponent<IProps, IState> {
               {this.props.titleComponent
                 ? this.props.titleComponent()
                 : this.renderTitle()}
-              {this.props.timerComponent
-                ? this.props.timerComponent()
-                : this.renderTimer(minutes, seconds)}
               {this.props.iconComponent
                 ? this.props.iconComponent()
                 : this.renderIcon()}
+              {this.props.timerComponent
+                  ? this.props.timerComponent()
+                  : this.renderTimer(minutes, seconds)}
               <Text
                 style={[
                    styles.text,

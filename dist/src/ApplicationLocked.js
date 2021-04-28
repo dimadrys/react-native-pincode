@@ -62,12 +62,12 @@ class ApplicationLocked extends React.PureComponent {
                     this.props.titleComponent
                         ? this.props.titleComponent()
                         : this.renderTitle(),
-                    this.props.timerComponent
-                        ? this.props.timerComponent()
-                        : this.renderTimer(minutes, seconds),
                     this.props.iconComponent
                         ? this.props.iconComponent()
                         : this.renderIcon(),
+                    this.props.timerComponent
+                        ? this.props.timerComponent()
+                        : this.renderTimer(minutes, seconds),
                     React.createElement(react_native_1.Text, { style: [
                             styles.text,
                             this.props.styleText
