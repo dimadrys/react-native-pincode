@@ -251,20 +251,6 @@ class PinCode extends React.PureComponent {
                 ? this.props.subtitleError
                 : this.props.subtitle));
         };
-        this.renderButton = () => {
-            return (React.createElement(react_native_1.TouchableOpacity, { onPress: () => {
-                    if (this.props.onClickButton) {
-                        this.props.onClickButton();
-                    }
-                    else {
-                        throw "Quit application";
-                    }
-                }, style: [styles.button, this.props.styleButton], accessible: true, accessibilityLabel: this.props.textButton },
-                React.createElement(react_native_1.Text, { style: [
-                        styles.closeButtonText,
-                        this.props.styleTextButton
-                    ] }, this.props.textButton)));
-        };
         this.state = {
             password: "",
             moveData: { x: 0, y: 0 },
@@ -274,7 +260,6 @@ class PinCode extends React.PureComponent {
             attemptFailed: false,
             changeScreen: false
         };
-        this.renderButton = this.renderButton.bind(this);
         this._circleSizeEmpty = this.props.styleCircleSizeEmpty || 4;
         this._circleSizeFull =
             this.props.styleCircleSizeFull || (this.props.pinCodeVisible ? 6 : 8);
@@ -375,18 +360,6 @@ class PinCode extends React.PureComponent {
                 this.props.subtitleComponent
                     ? this.props.subtitleComponent()
                     : this.renderSubtitle(colorSubtitle, opacityTitle, attemptFailed, showError)))),
-            React.createElement(Animate_1.default, { show: true, start: {
-                    opacity: 0
-                }, enter: {
-                    opacity: [1],
-                    timing: { delay: 2000, duration: 1500, ease: d3_ease_1.easeLinear }
-                } }, (state) => (React.createElement(react_native_1.View, { style: { opacity: state.opacity, flex: 1 } },
-                React.createElement(react_native_1.View, { style: [
-                        styles.viewCloseButton,
-                        this.props.styleViewButton
-                    ] }, this.props.buttonComponent
-                    ? this.props.buttonComponent()
-                    : this.renderButton())))),
             React.createElement(react_native_1.View, { style: styles.flexCirclePassword }, this.props.passwordComponent
                 ? this.props.passwordComponent()
                 : this.renderCirclePassword()),
@@ -500,8 +473,6 @@ PinCode.defaultProps = {
     textPasswordVisibleSize: 22,
     vibrationEnabled: true,
     delayBetweenAttempts: 3000,
-    styleButton: null,
-    textButton: "Reset Pin",
 };
 const styles = react_native_1.StyleSheet.create({
     container: {
@@ -596,25 +567,6 @@ const styles = react_native_1.StyleSheet.create({
         justifyContent: 'flex-start',
         width: "100%",
         flex: 7
-    },
-    viewCloseButton: {
-        alignItems: "center",
-        opacity: grid_1.grid.mediumOpacity,
-        justifyContent: "center",
-        marginTop: grid_1.grid.unit * 2
-    },
-    button: {
-        backgroundColor: colors_1.colors.turquoise,
-        borderRadius: grid_1.grid.border,
-        paddingLeft: grid_1.grid.unit * 2,
-        paddingRight: grid_1.grid.unit * 2,
-        paddingBottom: grid_1.grid.unit,
-        paddingTop: grid_1.grid.unit
-    },
-    closeButtonText: {
-        color: colors_1.colors.white,
-        fontWeight: "bold",
-        fontSize: 14
     }
 });
 exports.default = PinCode;

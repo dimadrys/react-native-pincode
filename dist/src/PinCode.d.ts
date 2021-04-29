@@ -65,11 +65,6 @@ export interface IProps {
     validationRegex?: RegExp;
     vibrationEnabled?: boolean;
     delayBetweenAttempts?: number;
-    styleButton?: any;
-    textButton?: string;
-    onClickButton?: any;
-    buttonComponent?: any;
-    styleViewButton?: null;
 }
 export interface IState {
     password: string;
@@ -106,7 +101,6 @@ declare class PinCode extends React.PureComponent<IProps, IState> {
     renderButtonDelete: (opacity: number) => JSX.Element;
     renderTitle: (colorTitle: string, opacityTitle: number, attemptFailed?: boolean, showError?: boolean) => JSX.Element;
     renderSubtitle: (colorTitle: string, opacityTitle: number, attemptFailed?: boolean, showError?: boolean) => JSX.Element;
-    renderButton: () => JSX.Element;
     render(): JSX.Element;
 }
 export default PinCode;
