@@ -13,6 +13,7 @@ import {
 } from 'react-native'
 import * as Keychain from 'react-native-keychain'
 import TouchID from 'react-native-touch-id'
+import * as LocalAuthentication from 'expo-local-authentication'
 
 /**
  * Pin Code Enter PIN Page
@@ -142,7 +143,7 @@ class PinCodeEnter extends React.PureComponent<IProps, IState> {
   }
 
   triggerTouchID() {
-    !!TouchID && TouchID.isSupported()
+    !!LocalAuthentication.hasHardwareAsync()
       .then(() => {
         setTimeout(() => {
           this.launchTouchID()
@@ -206,23 +207,27 @@ class PinCodeEnter extends React.PureComponent<IProps, IState> {
   }
 
   async launchTouchID() {
-    const optionalConfigObject = {
-      imageColor: '#e00606',
-      imageErrorColor: '#ff0000',
-      sensorDescription: 'Touch sensor',
-      sensorErrorDescription: 'Failed',
-      cancelText: this.props.textCancelButtonTouchID || 'Cancel',
-      fallbackLabel: 'Show Passcode',
-      unifiedErrors: false,
-      passcodeFallback: this.props.passcodeFallback
-    }
+    // const optionalConfigObject = {
+    //   promptMessage: this.props.touchIDTitle || 'Unlock with Biometrics',
+    //   disableDeviceFallback: true,
+    //   cancelLabel:  this.props.textCancelButtonTouchID || 'Cancel',
+
+      // imageColor: '#e00606',
+      // imageErrorColor: '#ff0000',
+      // sensorDescription: 'Touch sensor',
+      // sensorErrorDescription: 'Failed',
+      // cancelText: this.props.textCancelButtonTouchID || 'Cancel',
+      // fallbackLabel: 'Show Passcode',
+      // unifiedErrors: false,
+      // passcodeFallback: this.props.passcodeFallback
+    // }
+
     try {
-      await TouchID.authenticate(
-        this.props.touchIDSentence,
-        Object.assign({}, optionalConfigObject, {
-          title: this.props.touchIDTitle
-        })
-      ).then((success: any) => {
+      await LocalAuthentication.authenticateAsync({
+        promptMessage: this.props.touchIDSentence || 'Unlock with Biometrics',
+        disableDeviceFallback: true,
+        cancelLabel: this.props.textCancelButtonTouchID || 'Cancel',
+      }).then((success: any) => {
         this.endProcess(this.props.storedPin || this.keyChainResult)
       })
     } catch (e) {
@@ -232,7 +237,52 @@ class PinCodeEnter extends React.PureComponent<IProps, IState> {
         console.log('TouchID error', e)
       }
     }
+
+    // try {
+    //   await TouchID.authenticate(
+    //     this.props.touchIDSentence,
+    //     Object.assign({}, optionalConfigObject, {
+    //       title: this.props.touchIDTitle
+    //     })
+    //   ).then((success: any) => {
+    //     this.endProcess(this.props.storedPin || this.keyChainResult)
+    //   })
+    // } catch (e) {
+    //   if (!!this.props.callbackErrorTouchId) {
+    //     this.props.callbackErrorTouchId(e)
+    //   } else {
+    //     console.log('TouchID error', e)
+    //   }
+    // }
   }
+  // async launchTouchID() {
+  //   const optionalConfigObject = {
+  //     imageColor: '#e00606',
+  //     imageErrorColor: '#ff0000',
+  //     sensorDescription: 'Touch sensor',
+  //     sensorErrorDescription: 'Failed',
+  //     cancelText: this.props.textCancelButtonTouchID || 'Cancel',
+  //     fallbackLabel: 'Show Passcode',
+  //     unifiedErrors: false,
+  //     passcodeFallback: this.props.passcodeFallback
+  //   }
+  //   try {
+  //     await TouchID.authenticate(
+  //       this.props.touchIDSentence,
+  //       Object.assign({}, optionalConfigObject, {
+  //         title: this.props.touchIDTitle
+  //       })
+  //     ).then((success: any) => {
+  //       this.endProcess(this.props.storedPin || this.keyChainResult)
+  //     })
+  //   } catch (e) {
+  //     if (!!this.props.callbackErrorTouchId) {
+  //       this.props.callbackErrorTouchId(e)
+  //     } else {
+  //       console.log('TouchID error', e)
+  //     }
+  //   }
+  // }
 
   render() {
     const pin =

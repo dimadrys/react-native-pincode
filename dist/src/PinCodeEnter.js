@@ -7,7 +7,7 @@ const async_storage_1 = require("@react-native-community/async-storage");
 const React = require("react");
 const react_native_1 = require("react-native");
 const Keychain = require("react-native-keychain");
-const react_native_touch_id_1 = require("react-native-touch-id");
+const LocalAuthentication = require("expo-local-authentication");
 class PinCodeEnter extends React.PureComponent {
     constructor(props) {
         super(props);
@@ -80,7 +80,7 @@ class PinCodeEnter extends React.PureComponent {
         }
     }
     triggerTouchID() {
-        !!react_native_touch_id_1.default && react_native_touch_id_1.default.isSupported()
+        !!LocalAuthentication.hasHardwareAsync()
             .then(() => {
             setTimeout(() => {
                 this.launchTouchID();
@@ -91,20 +91,25 @@ class PinCodeEnter extends React.PureComponent {
         });
     }
     async launchTouchID() {
-        const optionalConfigObject = {
-            imageColor: '#e00606',
-            imageErrorColor: '#ff0000',
-            sensorDescription: 'Touch sensor',
-            sensorErrorDescription: 'Failed',
-            cancelText: this.props.textCancelButtonTouchID || 'Cancel',
-            fallbackLabel: 'Show Passcode',
-            unifiedErrors: false,
-            passcodeFallback: this.props.passcodeFallback
-        };
+        // const optionalConfigObject = {
+        //   promptMessage: this.props.touchIDTitle || 'Unlock with Biometrics',
+        //   disableDeviceFallback: true,
+        //   cancelLabel:  this.props.textCancelButtonTouchID || 'Cancel',
+        // imageColor: '#e00606',
+        // imageErrorColor: '#ff0000',
+        // sensorDescription: 'Touch sensor',
+        // sensorErrorDescription: 'Failed',
+        // cancelText: this.props.textCancelButtonTouchID || 'Cancel',
+        // fallbackLabel: 'Show Passcode',
+        // unifiedErrors: false,
+        // passcodeFallback: this.props.passcodeFallback
+        // }
         try {
-            await react_native_touch_id_1.default.authenticate(this.props.touchIDSentence, Object.assign({}, optionalConfigObject, {
-                title: this.props.touchIDTitle
-            })).then((success) => {
+            await LocalAuthentication.authenticateAsync({
+                promptMessage: this.props.touchIDSentence || 'Unlock with Biometrics',
+                disableDeviceFallback: true,
+                cancelLabel: this.props.textCancelButtonTouchID || 'Cancel',
+            }).then((success) => {
                 this.endProcess(this.props.storedPin || this.keyChainResult);
             });
         }
@@ -116,7 +121,51 @@ class PinCodeEnter extends React.PureComponent {
                 console.log('TouchID error', e);
             }
         }
+        // try {
+        //   await TouchID.authenticate(
+        //     this.props.touchIDSentence,
+        //     Object.assign({}, optionalConfigObject, {
+        //       title: this.props.touchIDTitle
+        //     })
+        //   ).then((success: any) => {
+        //     this.endProcess(this.props.storedPin || this.keyChainResult)
+        //   })
+        // } catch (e) {
+        //   if (!!this.props.callbackErrorTouchId) {
+        //     this.props.callbackErrorTouchId(e)
+        //   } else {
+        //     console.log('TouchID error', e)
+        //   }
+        // }
     }
+    // async launchTouchID() {
+    //   const optionalConfigObject = {
+    //     imageColor: '#e00606',
+    //     imageErrorColor: '#ff0000',
+    //     sensorDescription: 'Touch sensor',
+    //     sensorErrorDescription: 'Failed',
+    //     cancelText: this.props.textCancelButtonTouchID || 'Cancel',
+    //     fallbackLabel: 'Show Passcode',
+    //     unifiedErrors: false,
+    //     passcodeFallback: this.props.passcodeFallback
+    //   }
+    //   try {
+    //     await TouchID.authenticate(
+    //       this.props.touchIDSentence,
+    //       Object.assign({}, optionalConfigObject, {
+    //         title: this.props.touchIDTitle
+    //       })
+    //     ).then((success: any) => {
+    //       this.endProcess(this.props.storedPin || this.keyChainResult)
+    //     })
+    //   } catch (e) {
+    //     if (!!this.props.callbackErrorTouchId) {
+    //       this.props.callbackErrorTouchId(e)
+    //     } else {
+    //       console.log('TouchID error', e)
+    //     }
+    //   }
+    // }
     render() {
         const pin = this.props.storedPin || this.keyChainResult;
         return (React.createElement(react_native_1.View, { style: [
