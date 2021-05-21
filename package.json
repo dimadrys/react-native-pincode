@@ -1,9 +1,10 @@
 {
-  "name": "@haskkor/react-native-pincode",
-  "version": "1.22.6",
+  "name": "@dimadrys/react-native-pincode",
+  "version": "2.0.0",
   "description": "React native PIN code component",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
+  "fork": "@haskkor/react-native-pincode",
   "scripts": {
     "dev": "yarn build -watch",
     "build": "tsc",
@@ -17,14 +18,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Haskkor/react-native-pincode.git"
+    "url": "git+https://github.com/dimadrys/react-native-pincode.git"
   },
-  "author": "Jeremy Farnault",
+  "author": "Dima Drys",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/Haskkor/react-native-pincode/issues"
+    "url": "https://github.com/dimadrys/react-native-pincode/issues"
   },
-  "homepage": "https://github.com/Haskkor/react-native-pincode#readme",
+  "homepage": "https://github.com/dimadrys/react-native-pincode#readme",
   "devDependencies": {
     "@types/d3-ease": "^1.0.7",
     "@types/lodash": "^4.14.104",

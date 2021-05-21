@@ -146,6 +146,7 @@ class PinCodeEnter extends React.PureComponent<IProps, IState> {
     try {
       LocalAuthentication.isEnrolledAsync()
           .then((res) => {
+            console.warn('MODULE TouchID', res);
             if (res) {
               setTimeout(() => {
                 this.launchTouchID()
@@ -213,12 +214,15 @@ class PinCodeEnter extends React.PureComponent<IProps, IState> {
   }
 
   async launchTouchID() {
+    console.warn('MODULE TouchID INIT');
     try {
+      console.warn('MODULE TouchID START');
       await LocalAuthentication.authenticateAsync({
         promptMessage: this.props.touchIDSentence || 'Unlock with Biometrics',
         disableDeviceFallback: true,
         cancelLabel: this.props.textCancelButtonTouchID || 'Cancel',
       }).then((success: any) => {
+        console.warn('MODULE TouchID RESULT: ', success);
         this.endProcess(this.props.storedPin || this.keyChainResult)
       })
     } catch (e) {
