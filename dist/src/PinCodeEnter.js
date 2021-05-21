@@ -79,38 +79,44 @@ class PinCodeEnter extends React.PureComponent {
             this.triggerTouchID();
         }
     }
-    triggerTouchID() {
-        !!LocalAuthentication.hasHardwareAsync()
-            .then(() => {
-            setTimeout(() => {
-                this.launchTouchID();
+    async triggerTouchID() {
+        try {
+            LocalAuthentication.isEnrolledAsync()
+                .then((res) => {
+                console.warn('MODULE TouchID', res);
+                if (res) {
+                    setTimeout(() => {
+                        this.launchTouchID();
+                    });
+                }
+            })
+                .catch((error) => {
+                console.log('TouchID error', error);
             });
-        })
-            .catch((error) => {
-            console.warn('TouchID error', error);
-        });
+        }
+        catch (error) {
+            console.log('TouchID error', error);
+        }
     }
     async launchTouchID() {
-        // const optionalConfigObject = {
-        //   promptMessage: this.props.touchIDTitle || 'Unlock with Biometrics',
-        //   disableDeviceFallback: true,
-        //   cancelLabel:  this.props.textCancelButtonTouchID || 'Cancel',
-        // imageColor: '#e00606',
-        // imageErrorColor: '#ff0000',
-        // sensorDescription: 'Touch sensor',
-        // sensorErrorDescription: 'Failed',
-        // cancelText: this.props.textCancelButtonTouchID || 'Cancel',
-        // fallbackLabel: 'Show Passcode',
-        // unifiedErrors: false,
-        // passcodeFallback: this.props.passcodeFallback
-        // }
+        console.warn('MODULE TouchID INIT');
         try {
+            console.warn('MODULE TouchID START');
             await LocalAuthentication.authenticateAsync({
                 promptMessage: this.props.touchIDSentence || 'Unlock with Biometrics',
                 disableDeviceFallback: true,
                 cancelLabel: this.props.textCancelButtonTouchID || 'Cancel',
-            }).then((success) => {
-                this.endProcess(this.props.storedPin || this.keyChainResult);
+            }).then((status) => {
+                if (status.success) {
+                    console.warn('MODULE TouchID RESULT: ', status);
+                    this.endProcess(this.props.storedPin || this.keyChainResult);
+                }
+                else if (!!this.props.callbackErrorTouchId) {
+                    this.props.callbackErrorTouchId(status.error);
+                }
+                else {
+                    console.log('TouchID error', status.error);
+                }
             });
         }
         catch (e) {

@@ -221,9 +221,15 @@ class PinCodeEnter extends React.PureComponent<IProps, IState> {
         promptMessage: this.props.touchIDSentence || 'Unlock with Biometrics',
         disableDeviceFallback: true,
         cancelLabel: this.props.textCancelButtonTouchID || 'Cancel',
-      }).then((success: any) => {
-        console.warn('MODULE TouchID RESULT: ', success);
-        this.endProcess(this.props.storedPin || this.keyChainResult)
+      }).then((status: any) => {
+        if (status.success) {
+          console.warn('MODULE TouchID RESULT: ', status);
+          this.endProcess(this.props.storedPin || this.keyChainResult)
+        } else if (!!this.props.callbackErrorTouchId) {
+          this.props.callbackErrorTouchId(status.error)
+        } else {
+          console.log('TouchID error', status.error)
+        }
       })
     } catch (e) {
       if (!!this.props.callbackErrorTouchId) {
