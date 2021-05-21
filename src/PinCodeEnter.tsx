@@ -115,8 +115,8 @@ class PinCodeEnter extends React.PureComponent<IProps, IState> {
     this.launchTouchID = this.launchTouchID.bind(this)
     if (!this.props.storedPin) {
       Keychain.getInternetCredentials(
-        this.props.pinCodeKeychainName,
-        noBiometricsConfig
+          this.props.pinCodeKeychainName,
+          noBiometricsConfig
       ).then(result => {
         this.keyChainResult = result && result.password || undefined
       }).catch(error => {
@@ -130,9 +130,9 @@ class PinCodeEnter extends React.PureComponent<IProps, IState> {
   }
 
   componentDidUpdate(
-    prevProps: Readonly<IProps>,
-    prevState: Readonly<IState>,
-    prevContext: any
+      prevProps: Readonly<IProps>,
+      prevState: Readonly<IState>,
+      prevContext: any
   ): void {
     if (prevProps.pinStatusExternal !== this.props.pinStatusExternal) {
       this.setState({ pinCodeStatus: this.props.pinStatusExternal })
@@ -142,16 +142,22 @@ class PinCodeEnter extends React.PureComponent<IProps, IState> {
     }
   }
 
-  triggerTouchID() {
-    !!LocalAuthentication.hasHardwareAsync()
-      .then(() => {
-        setTimeout(() => {
-          this.launchTouchID()
-        })
-      })
-      .catch((error: any) => {
-        console.warn('TouchID error', error)
-      })
+  async triggerTouchID() {
+    try {
+      LocalAuthentication.isEnrolledAsync()
+          .then((res) => {
+            if (res) {
+              setTimeout(() => {
+                this.launchTouchID()
+              })
+            }
+          })
+          .catch((error: any) => {
+            console.log('TouchID error', error)
+          })
+    } catch (error) {
+      console.log('TouchID error', error);
+    }
   }
 
   endProcess = async (pinCode?: string) => {
@@ -165,7 +171,7 @@ class PinCodeEnter extends React.PureComponent<IProps, IState> {
       this.setState({ pinCodeStatus: PinResultStatus.initial })
       this.props.changeInternalStatus(PinResultStatus.initial)
       const pinAttemptsStr = await AsyncStorage.getItem(
-        this.props.pinAttemptsAsyncStorageName
+          this.props.pinAttemptsAsyncStorageName
       )
       let pinAttempts = pinAttemptsStr ? +pinAttemptsStr : 0
       const pin = this.props.storedPin || this.keyChainResult
@@ -181,19 +187,19 @@ class PinCodeEnter extends React.PureComponent<IProps, IState> {
       } else {
         pinAttempts++
         if (
-          +pinAttempts >= this.props.maxAttempts &&
-          !this.props.disableLockScreen
+            +pinAttempts >= this.props.maxAttempts &&
+            !this.props.disableLockScreen
         ) {
           await AsyncStorage.setItem(
-            this.props.timePinLockedAsyncStorageName,
-            new Date().toISOString()
+              this.props.timePinLockedAsyncStorageName,
+              new Date().toISOString()
           )
           this.setState({ locked: true, pinCodeStatus: PinResultStatus.locked })
           this.props.changeInternalStatus(PinResultStatus.locked)
         } else {
           await AsyncStorage.setItem(
-            this.props.pinAttemptsAsyncStorageName,
-            pinAttempts.toString()
+              this.props.pinAttemptsAsyncStorageName,
+              pinAttempts.toString()
           )
           this.setState({ pinCodeStatus: PinResultStatus.failure })
           this.props.changeInternalStatus(PinResultStatus.failure)
@@ -207,21 +213,6 @@ class PinCodeEnter extends React.PureComponent<IProps, IState> {
   }
 
   async launchTouchID() {
-    // const optionalConfigObject = {
-    //   promptMessage: this.props.touchIDTitle || 'Unlock with Biometrics',
-    //   disableDeviceFallback: true,
-    //   cancelLabel:  this.props.textCancelButtonTouchID || 'Cancel',
-
-      // imageColor: '#e00606',
-      // imageErrorColor: '#ff0000',
-      // sensorDescription: 'Touch sensor',
-      // sensorErrorDescription: 'Failed',
-      // cancelText: this.props.textCancelButtonTouchID || 'Cancel',
-      // fallbackLabel: 'Show Passcode',
-      // unifiedErrors: false,
-      // passcodeFallback: this.props.passcodeFallback
-    // }
-
     try {
       await LocalAuthentication.authenticateAsync({
         promptMessage: this.props.touchIDSentence || 'Unlock with Biometrics',
@@ -286,86 +277,86 @@ class PinCodeEnter extends React.PureComponent<IProps, IState> {
 
   render() {
     const pin =
-      this.props.storedPin || this.keyChainResult
+        this.props.storedPin || this.keyChainResult
     return (
-      <View
-        style={[
-          styles.container,
-          this.props.styleContainer
-        ]}>
-        <PinCode
-          alphabetCharsVisible={this.props.alphabetCharsVisible}
-          buttonDeleteComponent={this.props.buttonDeleteComponent || null}
-          buttonDeleteText={this.props.buttonDeleteText}
-          buttonNumberComponent={this.props.buttonNumberComponent || null}
-          colorCircleButtons={this.props.colorCircleButtons}
-          colorPassword={this.props.colorPassword || undefined}
-          colorPasswordEmpty={this.props.colorPasswordEmpty}
-          colorPasswordError={this.props.colorPasswordError || undefined}
-          customBackSpaceIcon={this.props.customBackSpaceIcon}
-          emptyColumnComponent={this.props.emptyColumnComponent}
-          endProcess={this.endProcess}
-          launchTouchID={this.launchTouchID}
-          getCurrentLength={this.props.getCurrentLength}
-          iconButtonDeleteDisabled={this.props.iconButtonDeleteDisabled}
-          numbersButtonOverlayColor={
-            this.props.numbersButtonOverlayColor || undefined
-          }
-          passwordComponent={this.props.passwordComponent || null}
-          passwordLength={this.props.passwordLength || 4}
-          pinCodeStatus={this.state.pinCodeStatus}
-          pinCodeVisible={this.props.pinCodeVisible}
-          previousPin={pin}
-          sentenceTitle={this.props.title}
-          status={PinStatus.enter}
-          styleAlphabet={this.props.styleAlphabet}
-          styleButtonCircle={this.props.styleButtonCircle}
-          styleCircleHiddenPassword={this.props.styleCircleHiddenPassword}
-          styleCircleSizeEmpty={this.props.styleCircleSizeEmpty}
-          styleCircleSizeFull={this.props.styleCircleSizeFull}
-          styleColumnButtons={this.props.styleColumnButtons}
-          styleColumnDeleteButton={this.props.styleColumnDeleteButton}
-          styleColorButtonTitle={this.props.styleColorButtonTitle}
-          styleColorButtonTitleSelected={
-            this.props.styleColorButtonTitleSelected
-          }
-          styleColorSubtitle={this.props.styleColorSubtitle}
-          styleColorSubtitleError={this.props.styleColorSubtitleError}
-          styleColorTitle={this.props.styleColorTitle}
-          styleColorTitleError={this.props.styleColorTitleError}
-          styleContainer={this.props.styleContainerPinCode}
-          styleDeleteButtonColorHideUnderlay={
-            this.props.styleDeleteButtonColorHideUnderlay
-          }
-          styleDeleteButtonColorShowUnderlay={
-            this.props.styleDeleteButtonColorShowUnderlay
-          }
-          styleDeleteButtonIcon={this.props.styleDeleteButtonIcon}
-          styleDeleteButtonSize={this.props.styleDeleteButtonSize}
-          styleDeleteButtonText={this.props.styleDeleteButtonText}
-          styleEmptyColumn={this.props.styleEmptyColumn}
-          stylePinCodeCircle={this.props.stylePinCodeCircle}
-          styleRowButtons={this.props.styleRowButtons}
-          styleTextButton={this.props.styleTextButton}
-          styleTextSubtitle={this.props.styleTextSubtitle}
-          styleTextTitle={this.props.styleTextTitle}
-          styleViewTitle={this.props.styleViewTitle}
-          subtitle={this.props.subtitle}
-          subtitleComponent={this.props.subtitleComponent || null}
-          subtitleError={this.props.subtitleError || 'Please try again'}
-          textPasswordVisibleFamily={this.props.textPasswordVisibleFamily}
-          textPasswordVisibleSize={this.props.textPasswordVisibleSize}
-          titleAttemptFailed={
-            this.props.titleAttemptFailed || 'Incorrect PIN Code'
-          }
-          titleComponent={this.props.titleComponent || null}
-          titleConfirmFailed={
-            this.props.titleConfirmFailed || 'Your entries did not match'
-          }
-          vibrationEnabled={this.props.vibrationEnabled}
-          delayBetweenAttempts={this.props.delayBetweenAttempts}
-        />
-      </View>
+        <View
+            style={[
+              styles.container,
+              this.props.styleContainer
+            ]}>
+          <PinCode
+              alphabetCharsVisible={this.props.alphabetCharsVisible}
+              buttonDeleteComponent={this.props.buttonDeleteComponent || null}
+              buttonDeleteText={this.props.buttonDeleteText}
+              buttonNumberComponent={this.props.buttonNumberComponent || null}
+              colorCircleButtons={this.props.colorCircleButtons}
+              colorPassword={this.props.colorPassword || undefined}
+              colorPasswordEmpty={this.props.colorPasswordEmpty}
+              colorPasswordError={this.props.colorPasswordError || undefined}
+              customBackSpaceIcon={this.props.customBackSpaceIcon}
+              emptyColumnComponent={this.props.emptyColumnComponent}
+              endProcess={this.endProcess}
+              launchTouchID={this.launchTouchID}
+              getCurrentLength={this.props.getCurrentLength}
+              iconButtonDeleteDisabled={this.props.iconButtonDeleteDisabled}
+              numbersButtonOverlayColor={
+                this.props.numbersButtonOverlayColor || undefined
+              }
+              passwordComponent={this.props.passwordComponent || null}
+              passwordLength={this.props.passwordLength || 4}
+              pinCodeStatus={this.state.pinCodeStatus}
+              pinCodeVisible={this.props.pinCodeVisible}
+              previousPin={pin}
+              sentenceTitle={this.props.title}
+              status={PinStatus.enter}
+              styleAlphabet={this.props.styleAlphabet}
+              styleButtonCircle={this.props.styleButtonCircle}
+              styleCircleHiddenPassword={this.props.styleCircleHiddenPassword}
+              styleCircleSizeEmpty={this.props.styleCircleSizeEmpty}
+              styleCircleSizeFull={this.props.styleCircleSizeFull}
+              styleColumnButtons={this.props.styleColumnButtons}
+              styleColumnDeleteButton={this.props.styleColumnDeleteButton}
+              styleColorButtonTitle={this.props.styleColorButtonTitle}
+              styleColorButtonTitleSelected={
+                this.props.styleColorButtonTitleSelected
+              }
+              styleColorSubtitle={this.props.styleColorSubtitle}
+              styleColorSubtitleError={this.props.styleColorSubtitleError}
+              styleColorTitle={this.props.styleColorTitle}
+              styleColorTitleError={this.props.styleColorTitleError}
+              styleContainer={this.props.styleContainerPinCode}
+              styleDeleteButtonColorHideUnderlay={
+                this.props.styleDeleteButtonColorHideUnderlay
+              }
+              styleDeleteButtonColorShowUnderlay={
+                this.props.styleDeleteButtonColorShowUnderlay
+              }
+              styleDeleteButtonIcon={this.props.styleDeleteButtonIcon}
+              styleDeleteButtonSize={this.props.styleDeleteButtonSize}
+              styleDeleteButtonText={this.props.styleDeleteButtonText}
+              styleEmptyColumn={this.props.styleEmptyColumn}
+              stylePinCodeCircle={this.props.stylePinCodeCircle}
+              styleRowButtons={this.props.styleRowButtons}
+              styleTextButton={this.props.styleTextButton}
+              styleTextSubtitle={this.props.styleTextSubtitle}
+              styleTextTitle={this.props.styleTextTitle}
+              styleViewTitle={this.props.styleViewTitle}
+              subtitle={this.props.subtitle}
+              subtitleComponent={this.props.subtitleComponent || null}
+              subtitleError={this.props.subtitleError || 'Please try again'}
+              textPasswordVisibleFamily={this.props.textPasswordVisibleFamily}
+              textPasswordVisibleSize={this.props.textPasswordVisibleSize}
+              titleAttemptFailed={
+                this.props.titleAttemptFailed || 'Incorrect PIN Code'
+              }
+              titleComponent={this.props.titleComponent || null}
+              titleConfirmFailed={
+                this.props.titleConfirmFailed || 'Your entries did not match'
+              }
+              vibrationEnabled={this.props.vibrationEnabled}
+              delayBetweenAttempts={this.props.delayBetweenAttempts}
+          />
+        </View>
     )
   }
 }
